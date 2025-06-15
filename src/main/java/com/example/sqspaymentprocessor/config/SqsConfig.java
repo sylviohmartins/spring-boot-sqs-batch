@@ -18,6 +18,7 @@ import org.springframework.messaging.converter.MessageConverter;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.SqsAsyncClientBuilder;
 
 /**
  * Configuração do SQS para a aplicação Spring Boot. Define beans para SqsAsyncClient, SqsTemplate e SqsMessageListenerContainerFactory. Utiliza recursos modernos do Java 21 como Virtual Threads para alta performance.
@@ -54,17 +55,17 @@ public class SqsConfig {
   @Bean
   @Primary // Marca como primário para injeção automática
   public SqsAsyncClient sqsAsyncClient() {
-    SqsAsyncClient builder = SqsAsyncClient.builder()
+    // Usa o builder do SqsAsyncClient para permitir configuração condicional do endpoint
+    SqsAsyncClientBuilder builder = SqsAsyncClient.builder()
         .region(Region.of(awsRegion))
-        .credentialsProvider(DefaultCredentialsProvider.create())
-        .build();
+        .credentialsProvider(DefaultCredentialsProvider.create());
 
     // Se a URL do endpoint SQS (LocalStack) for fornecida, configura-a
     if (sqsEndpointUrl != null && !sqsEndpointUrl.trim().isEmpty()) {
       builder.endpointOverride(URI.create(sqsEndpointUrl));
     }
 
-    return builder;
+    return builder.build();
   }
 
   /**
