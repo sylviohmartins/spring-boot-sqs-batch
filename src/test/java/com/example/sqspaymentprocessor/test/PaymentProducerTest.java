@@ -5,6 +5,7 @@ import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.example.sqspaymentprocessor.domain.Payment;
 import com.example.sqspaymentprocessor.producer.PaymentProducer;
+import io.awspring.cloud.sqs.operations.SendResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,7 +111,7 @@ public class PaymentProducerTest {
         }
 
         // Enviar os pagamentos em lote
-        List<CompletableFuture<Void>> futures = paymentProducer.sendPaymentsBatch(payments);
+        List<CompletableFuture<SendResult<Object>>> futures = paymentProducer.sendPaymentsBatch(payments);
         
         // Aguardar a conclusão de todos os envios
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(10, TimeUnit.SECONDS);
