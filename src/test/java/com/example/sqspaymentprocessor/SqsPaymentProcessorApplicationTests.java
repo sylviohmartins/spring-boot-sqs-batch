@@ -95,11 +95,11 @@ class SqsPaymentProcessorApplicationTests {
         int batchSize = 15; // Testar com um lote maior que 10 para verificar o tratamento do SqsTemplate
         List<Payment> payments = new ArrayList<>();
         for (int i = 0; i < batchSize; i++) {
-            payments.add(Payment.createPending(
-                    "order-" + i,
+            payments.add(Payment.createNew(
                     BigDecimal.valueOf(100.0 + i),
-                    "BRL",
-                    "CREDIT_CARD"
+                    "source-" + i,
+                    "dest-" + i,
+                    "Pagamento " + i
             ));
         }
 
@@ -112,7 +112,7 @@ class SqsPaymentProcessorApplicationTests {
 ", batchSize, paymentQueueName);
 
         // Assert: Verifica se o consumidor processou as mensagens
-        // Usamos Awaitility para esperar que o método receivePaymentBatch seja chamado
+        // Usamos Awaitility para esperar que o método receivePaymentMessages seja chamado
         // com um lote contendo o número esperado de mensagens.
         // O SqsTemplate divide lotes > 10, então esperamos múltiplas chamadas ao listener.
         // Verificamos se foi chamado pelo menos N vezes, onde N = ceil(batchSize / maxMessagesPerPoll)
@@ -122,7 +122,7 @@ class SqsPaymentProcessorApplicationTests {
         await().atMost(Duration.ofSeconds(30)) // Timeout generoso para SQS e processamento simulado
                .pollInterval(Duration.ofSeconds(1))
                .untilAsserted(() -> verify(paymentConsumer, atLeast(expectedListenerInvocations))
-                       .receivePaymentBatch(anyList()));
+                       .receivePaymentMessages(anyList(), any()));
 
         log.info("Listener invocado pelo menos {} vezes como esperado.", expectedListenerInvocations);
 
