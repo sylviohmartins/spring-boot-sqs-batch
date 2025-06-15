@@ -1,0 +1,32 @@
+# Configurações Específicas para o Ambiente de Teste (Sobrescreve application.yml)
+
+spring:
+  cloud:
+    aws:
+      region:
+        static: us-east-1 # Região consistente para testes com LocalStack
+      credentials:
+        access-key: test # Credenciais dummy para LocalStack
+        secret-key: test
+      sqs:
+        # O endpoint será configurado dinamicamente pelo Testcontainers @ServiceConnection
+        # endpoint: http://localhost:4566 # Exemplo se não usar @ServiceConnection
+        listener:
+          # Configurações podem ser ajustadas para testes mais rápidos se necessário
+          poll-timeout: 5s
+          max-number-of-messages: 10 # Manter o batch size para testar o cenário real
+
+# Nomes das filas para testes (podem ser os mesmos ou diferentes)
+app:
+  queues:
+    payment-processing: payment-processing-queue-test
+    payment-dlq: payment-processing-dlq-test
+
+# Logging para testes (pode ser mais verboso)
+logging:
+  level:
+    com.example.sqspaymentprocessor: DEBUG
+    io.awspring.cloud.sqs: DEBUG # Habilitar logs do SQS para debug de testes
+    org.testcontainers: INFO
+    com.github.dockerjava: WARN
+

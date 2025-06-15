@@ -1,0 +1,28 @@
+spring:
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      sqs:
+        endpoint: http://localhost:4566  # Endpoint para LocalStack em ambiente de desenvolvimento
+      credentials:
+        access-key: test
+        secret-key: test
+        instance-profile: false
+        use-default-aws-credentials-chain: true
+
+# Configurações da aplicação
+app:
+  config:
+    payment-queue-name: payment-queue
+    payment-queue-url: http://localhost:4566/000000000000/payment-queue
+    max-concurrent-messages: 20  # Número máximo de mensagens processadas concorrentemente
+    max-retries: 3  # Número máximo de tentativas de reprocessamento
+    visibility-timeout: 30  # Tempo em segundos que a mensagem fica invisível após ser recebida
+
+# Configurações de logging
+logging:
+  level:
+    com.example.sqspaymentprocessor: DEBUG
+    io.awspring.cloud: INFO
+    org.springframework: INFO
